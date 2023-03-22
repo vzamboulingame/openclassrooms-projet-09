@@ -11,10 +11,10 @@ export const filteredBills = (data, status) => {
         let selectCondition;
 
         // in jest environment
+        /* istanbul ignore next */
         if (typeof jest !== "undefined") {
           selectCondition = bill.status === status;
         } else {
-          /* istanbul ignore next */
           // in prod environment
           const userEmail = JSON.parse(localStorage.getItem("user")).email;
           selectCondition =
