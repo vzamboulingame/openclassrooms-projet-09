@@ -1,13 +1,13 @@
 /**
  * @jest-environment jsdom
  */
-import { fireEvent, screen, waitFor } from "@testing-library/dom";
+import { screen, waitFor } from "@testing-library/dom";
+import userEvent from "@testing-library/user-event";
 import { ROUTES_PATH } from "../constants/routes";
 import { localStorageMock } from "../__mocks__/localStorage.js";
 import mockStore from "../__mocks__/store";
 import BillsUI from "../views/BillsUI.js";
 import { bills } from "../fixtures/bills.js";
-import Bills from "../containers/Bills.js";
 import router from "../app/Router.js";
 
 jest.mock("../app/store", () => mockStore);
@@ -29,6 +29,7 @@ describe("Given I am connected as an employee", () => {
       document.body.append(root);
       router();
     });
+
     test("Then bill icon in vertical layout should be highlighted", async () => {
       window.onNavigate(ROUTES_PATH.Bills);
       const windowIcon = await waitFor(() => screen.getByTestId("icon-window"));
@@ -74,6 +75,7 @@ describe("Given I am connected as an employee", () => {
       document.body.appendChild(root);
       router();
     });
+
     test("Then bills fetch from API should fail with 404 message error", async () => {
       mockStore.bills.mockImplementationOnce(() => {
         return {
@@ -120,22 +122,16 @@ describe("Given I am connected as an employee", () => {
       document.body.append(root);
       router();
     });
+
     test("Then it should redirect to New Bill Page", async () => {
       window.onNavigate(ROUTES_PATH.Bills);
-
-      const handleClickNewBill = jest.fn(Bills.handleClickNewBill);
       const newBillBtn = await waitFor(() =>
         screen.getByTestId("btn-new-bill")
       );
-
-      newBillBtn.addEventListener("click", handleClickNewBill);
-      fireEvent.click(newBillBtn);
-
+      userEvent.click(newBillBtn);
       const submitBtn = await waitFor(() =>
         document.getElementById("btn-send-bill")
       );
-
-      expect(handleClickNewBill).toHaveBeenCalled();
       expect(submitBtn).toBeTruthy();
     });
   });
@@ -156,21 +152,14 @@ describe("Given I am connected as an employee", () => {
       document.body.append(root);
       router();
     });
-    test("Then a modal with the receipt image should be displayed", async () => {
+
+    test("Then a modal with a header text should be displayed", async () => {
       window.onNavigate(ROUTES_PATH.Bills);
-
       $.fn.modal = jest.fn();
-      const handleClickIconEye = jest.fn(Bills.handleClickIconEye);
       const eyeIcons = await waitFor(() => screen.getAllByTestId("icon-eye"));
-
       const lastEyeIcon = eyeIcons.reverse()[0];
-
-      lastEyeIcon.addEventListener("click", handleClickIconEye);
-      fireEvent.click(lastEyeIcon);
-
+      userEvent.click(lastEyeIcon);
       const headerText = await waitFor(() => screen.getByText("Justificatif"));
-
-      expect(handleClickIconEye).toHaveBeenCalled();
       expect(headerText).toBeTruthy();
     });
   });
